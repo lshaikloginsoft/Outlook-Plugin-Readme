@@ -139,6 +139,9 @@ https://yourdomain.azurewebsites.net
 
 * `Mail.Send`
 * `Mail.ReadWrite`
+* `User.Read`
+* `profile`
+* `openid`
 
 3. Click **Grant admin consent for [Tenant]**
 
@@ -219,16 +222,27 @@ https://outlook.office.com
 
 ## Prepare and Deploy Outlook Add-in Code
 
-### 1. Update Code Before Deployment
+### Update Code Before Deployment
 
-Modify below files with appropriate values as shown below
-| File         | Key / Setting                 | Update Instruction                            | Required |
-| ------------ | ----------------------------- | --------------------------------------------- | -------- |
-| manifest.xml | WebApplicationInfo → Id       | Paste **Client ID**                           | ✅        |
-| manifest.xml | WebApplicationInfo → Resource | Paste **Application URI**                     | ✅        |
-| taskpane.js  | API calls / URLs              | Replace placeholder domain with Web App URL   | ✅        |
-| server.js    | aud                           | Replace with **Application URI**              | ✅        |
-| config.js    | Messages / Emails             | Customize optional messages/destination email | ⚪        |
+Before deploying, update all placeholder values in the project files.
+
+> **Important:**
+> In `manifest.xml`, `taskpane.js`, and `server.js`, search for **`yourdomain`** and replace it with your **Azure Web App URL** (e.g., `https://myoutlookaddin.azurewebsites.net`).
+
+
+| File         | Key / Setting                 | Update Instruction                                   | Required |
+| ------------ | ----------------------------- | ---------------------------------------------------- | -------- |
+| manifest.xml | WebApplicationInfo → Id       | Paste **Client ID**                                  | ✅        |
+| manifest.xml | WebApplicationInfo → Resource | Paste **Application URI**                            | ✅        |
+| manifest.xml | SourceLocation / URLs         | Replace `yourdomain` with your **Azure Web App URL** | ✅        |
+| taskpane.js  | API calls / URLs              | Replace `yourdomain` with your **Azure Web App URL** | ✅        |
+| server.js    | audience                           | Replace with **Application URI**                     | ✅        |
+| config.js    | Messages             | Customizable Taskpane UI messages     | ⚪        |
+
+---
+
+![manifestwebappinfo](images/manifest-webappinfo-section.png)
+
 
 
 ### 2. Push Code to GitHub
@@ -244,8 +258,34 @@ git push -u origin main
 
 ### 3. Deploy to Azure Web App
 
-1. Navigate: **Deployment Center → GitHub**
-2. Authenticate GitHub → select repo and branch → Click **Finish**
+1. Go to your Azure Web App and Navigate to **Settings → Configuration(Preview) → General Settings** 
+and Enable below options `SCM and Always ON`
+
+![webappscm](images/webapp-scm.png)
+
+![webappalwayson](images/webapp-always-on.png)
+
+
+2. Now navigate to **Deployment → Deployment Center** and Select source as **GitHub**
+
+![deploytogithub](images/deploy-to-github.png)
+
+
+3. Authenticate GitHub → select `repo` in which above code is present and branch → Click **Save**
+
+![uploadinggithubrepo](images/uploading-github-repo.png)
+
+4. Now if you go to above selected repository and go to `Actions` tab. You can see app is build and deploy.
+
+![githubactions](images/github-actions.png)
+
+Please wait until the actions are finished.
+
+5. Next you can go to 'Web App → Logstream` and wait till you see that backend is running on port
+
+![backendready](images/backend-ready.png)
+
+
 
 ### 4. Verify Deployment
 
@@ -257,14 +297,6 @@ https://<WebAppDomain>/health
 ```
 
 Expected: `{"status":"OK"}`
-
-### 5. Configure Always On
-
-```
-Settings → Configuration → General Settings → Always On → Enabled
-```
-
-Restart Web App.
 
 ---
 
